@@ -23,8 +23,39 @@ public abstract class Piece {
     public abstract boolean canMove(int newRow, int newCol);
 
     public void move(int newRow, int newCol) {
-        row = newRow;
-        col = newCol;
+        List<AttackSequence> attackSequences = owner.getLongestAttackSequences();
+
+        if (attackSequences.isEmpty()) {
+            row = newRow;
+            col = newCol;
+            return;
+        }
+
+        for (AttackSequence attackSequence : attackSequences) {
+            int targetRow = attackSequence.targetRow;
+            int targetCol = attackSequence.targetCol;
+            if (attackSequence.piece == this && targetRow == newRow && targetCol == newCol) {
+                List<Piece> enemyPieces = owner.getEnemy().getPieces();
+                List<int[]> capturedPositions = attackSequence.capturedPositions;
+                List<Piece> removedPieces = new ArrayList<>();
+                for (int[] capturedPosition : capturedPositions) {
+                    int capturedRow = capturedPosition[0];
+                    int capturedCol = capturedPosition[1];
+                    for (Piece enemyPiece : enemyPieces) {
+                        if (enemyPiece.getRow() == capturedRow && enemyPiece.getCol() == capturedCol) {
+                            removedPieces.add(enemyPiece);
+                        }
+                    }
+                }
+                for (Piece removedPiece : removedPieces) {
+                    enemyPieces.remove(removedPiece);
+                }
+                owner.increamentScore(attackSequence.length);
+                row = newRow;
+                col = newCol;
+                break;
+            }
+        }
     }
 
     protected boolean isPositionOccupied(int newRow, int newCol) {

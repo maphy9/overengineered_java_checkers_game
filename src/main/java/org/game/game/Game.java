@@ -27,6 +27,7 @@ public class Game implements Runnable {
             try {
                 activePlayer = whitePlayer;
                 whitePlayer.turn();
+                drawScores();
                 drawPieces();
                 if (isGameOver()) {
                     break;
@@ -34,6 +35,7 @@ public class Game implements Runnable {
 
                 activePlayer = blackPlayer;
                 blackPlayer.turn();
+                drawScores();
                 drawPieces();
                 if (isGameOver()) {
                     break;
@@ -58,7 +60,11 @@ public class Game implements Runnable {
     }
 
     private void drawPieces() {
-        Platform.runLater(() -> gameSceneController.gamePaneController.drawPieces(whitePlayer, blackPlayer));
+        Platform.runLater(() -> gameSceneController.drawPieces(whitePlayer, blackPlayer));
+    }
+
+    private void drawScores() {
+        Platform.runLater(() -> gameSceneController.drawScores(whitePlayer.getScore(), blackPlayer.getScore()));
     }
 
     private boolean isGameOver() {

@@ -11,6 +11,7 @@ public abstract class Player {
     private volatile Piece selectedPiece;
     private volatile int selectedRow = -1;
     private volatile int selectedCol = -1;
+    private int score = 0;
     private List<AttackSequence> longestAttackSequences;
 
     public abstract void initializePieces();
@@ -99,6 +100,11 @@ public abstract class Player {
 
         for (AttackSequence attackSequence : longestAttackSequences) {
             System.out.println("Possible attack sequence: " + attackSequence.sourceRow + "; " + attackSequence.sourceCol + " -> " + attackSequence.targetRow + "; " + attackSequence.targetCol);
+            System.out.println("Capturing: ");
+            for (int[] coords : attackSequence.capturedPositions) {
+                System.out.print(coords[0] + "; " + coords[1] + " -> ");
+            }
+            System.out.println();
         }
 
         this.longestAttackSequences = longestAttackSequences;
@@ -106,5 +112,13 @@ public abstract class Player {
 
     public List<AttackSequence> getLongestAttackSequences() {
         return longestAttackSequences;
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public void increamentScore(int delta) {
+        score += delta;
     }
 }
