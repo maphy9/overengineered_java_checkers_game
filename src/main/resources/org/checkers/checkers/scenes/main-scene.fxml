@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane id="main" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" style="-fx-background-image: url(&quot;background.jpg&quot;); -fx-background-size: cover;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.checkers.checkers.MainSceneController">
+   <children>
+      <Button layoutX="490.0" layoutY="279.0" mnemonicParsing="false" onAction="#switchToGameScene" prefHeight="52.0" prefWidth="300.0" text="Start an offline game">
+         <cursor>
+            <Cursor fx:constant="CROSSHAIR" />
+         </cursor>
+         <font>
+            <Font size="24.0" />
+         </font></Button>
+      <Label layoutX="539.0" layoutY="112.0" text="Checkers" textFill="#ffeec6">
+         <font>
+            <Font name="System Bold" size="48.0" />
+         </font></Label>
+   </children>
+</AnchorPane>
