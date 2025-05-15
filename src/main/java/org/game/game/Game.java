@@ -1,6 +1,7 @@
 package org.game.game;
 
 import javafx.application.Platform;
+import javafx.scene.control.Label;
 import org.checkers.checkers.GameSceneController;
 import org.pieces.pieces.Piece;
 
@@ -10,13 +11,17 @@ import java.util.List;
 import static org.checkers.checkers.Main.BOARD_SIZE;
 
 public class Game implements Runnable {
-    private final GameSceneController gameSceneController;
+    public final GameSceneController gameSceneController;
     private Player whitePlayer;
     private Player blackPlayer;
     private Player activePlayer;
+    private final Label whitePlayerTimeLeft;
+    private final Label blackPlayerTimeLeft;
 
-    public Game(GameSceneController gameSceneController) {
+    public Game(GameSceneController gameSceneController, Label whitePlayerTimeLeft, Label blackPlayerTimeLeft) {
         this.gameSceneController = gameSceneController;
+        this.whitePlayerTimeLeft = whitePlayerTimeLeft;
+        this.blackPlayerTimeLeft = blackPlayerTimeLeft;
     }
 
     @Override
@@ -30,6 +35,7 @@ public class Game implements Runnable {
                 drawScores();
                 drawPieces();
                 if (isGameOver()) {
+                    drawMessage();
                     break;
                 }
 
@@ -38,9 +44,10 @@ public class Game implements Runnable {
                 drawScores();
                 drawPieces();
                 if (isGameOver()) {
+                    drawMessage();
                     break;
                 }
-            } catch (InterruptedException e) {
+            } catch(Exception e) {
                 break;
             }
         }
@@ -57,6 +64,10 @@ public class Game implements Runnable {
         blackPlayer.setEnemy(whitePlayer);
 
         drawPieces();
+
+        GameTimer gameTimer = new GameTimer(this, whitePlayer, blackPlayer);
+        Thread gameTimerThread = new Thread(gameTimer);
+        gameTimerThread.start();
     }
 
     private void drawPieces() {
@@ -67,7 +78,25 @@ public class Game implements Runnable {
         Platform.runLater(() -> gameSceneController.drawScores(whitePlayer.getScore(), blackPlayer.getScore()));
     }
 
+    private void drawMessage() {
+        String message = "";
+        if (whitePlayer.getPieces().isEmpty()) {
+            message = "Black player wins!";
+        }
+        if (blackPlayer.getPieces().isEmpty()) {
+            message = "White player wins!";
+        }
+        String finalMessage = message;
+        Platform.runLater(() -> gameSceneController.drawMessage(finalMessage));
+    }
+
     private boolean isGameOver() {
+        if (whitePlayer.getPieces().isEmpty()) {
+            return true;
+        }
+        if (blackPlayer.getPieces().isEmpty()) {
+            return true;
+        }
         return false;
     }
 

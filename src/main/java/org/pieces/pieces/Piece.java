@@ -22,40 +22,24 @@ public abstract class Piece {
 
     public abstract boolean canMove(int newRow, int newCol);
 
-    public void move(int newRow, int newCol) {
+    public abstract void move(int newRow, int newCol);
+
+    public AttackSequence getMoveAttackSequence(int newRow, int newCol) {
         List<AttackSequence> attackSequences = owner.getLongestAttackSequences();
 
         if (attackSequences.isEmpty()) {
-            row = newRow;
-            col = newCol;
-            return;
+            return null;
         }
 
         for (AttackSequence attackSequence : attackSequences) {
             int targetRow = attackSequence.targetRow;
             int targetCol = attackSequence.targetCol;
             if (attackSequence.piece == this && targetRow == newRow && targetCol == newCol) {
-                List<Piece> enemyPieces = owner.getEnemy().getPieces();
-                List<int[]> capturedPositions = attackSequence.capturedPositions;
-                List<Piece> removedPieces = new ArrayList<>();
-                for (int[] capturedPosition : capturedPositions) {
-                    int capturedRow = capturedPosition[0];
-                    int capturedCol = capturedPosition[1];
-                    for (Piece enemyPiece : enemyPieces) {
-                        if (enemyPiece.getRow() == capturedRow && enemyPiece.getCol() == capturedCol) {
-                            removedPieces.add(enemyPiece);
-                        }
-                    }
-                }
-                for (Piece removedPiece : removedPieces) {
-                    enemyPieces.remove(removedPiece);
-                }
-                owner.increamentScore(attackSequence.length);
-                row = newRow;
-                col = newCol;
-                break;
+                return attackSequence;
             }
         }
+
+        return null;
     }
 
     protected boolean isPositionOccupied(int newRow, int newCol) {
@@ -100,6 +84,25 @@ public abstract class Piece {
 
     public Player getOwner() {
         return owner;
+    }
+
+    protected boolean canAttack(int newRow, int newCol) {
+        List<AttackSequence> longestAttackSequences = getOwner().getLongestAttackSequences();
+        if (!longestAttackSequences.isEmpty()) {
+            for (AttackSequence attackSequence : longestAttackSequences) {
+                Piece piece = attackSequence.piece;
+                int targetRow = attackSequence.targetRow;
+                int targetCol = attackSequence.targetCol;
+                if (this == piece) {
+                    if (newRow == targetRow && newCol == targetCol) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        return true;
     }
 
     public abstract List<AttackSequence> getLongestAttackSequences(char[][] board);

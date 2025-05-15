@@ -14,25 +14,6 @@ public abstract class Man extends Piece {
         super(row, col, pieceImage, player);
     }
 
-    protected boolean canAttack(int newRow, int newCol) {
-        List<AttackSequence> longestAttackSequences = getOwner().getLongestAttackSequences();
-        if (!longestAttackSequences.isEmpty()) {
-            for (AttackSequence attackSequence : longestAttackSequences) {
-                Piece piece = attackSequence.piece;
-                int targetRow = attackSequence.targetRow;
-                int targetCol = attackSequence.targetCol;
-                if (this == piece) {
-                    if (newRow == targetRow && newCol == targetCol) {
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
-
-        return true;
-    }
-
     private List<AttackSequence> getLongestAttackSequencesHelper(char[][] board, int targetRow, int targetCol, int captureRow, int captureCol) {
         int row = getRow() - 1;
         int col = getCol() - 1;
@@ -128,4 +109,40 @@ public abstract class Man extends Piece {
 
         return longestAttackSequence;
     }
+
+    @Override
+    public void move(int newRow, int newCol) {
+        AttackSequence attackSequence = getMoveAttackSequence(newRow, newCol);
+
+        if (attackSequence == null) {
+            setRow(newRow);
+            setCol(newCol);
+            becomeKing();
+            return;
+        }
+
+        List<Piece> enemyPieces = getOwner().getEnemy().getPieces();
+        List<int[]> capturedPositions = attackSequence.capturedPositions;
+        List<Piece> removedPieces = new ArrayList<>();
+        for (int[] capturedPosition : capturedPositions) {
+            int capturedRow = capturedPosition[0];
+            int capturedCol = capturedPosition[1];
+            for (Piece enemyPiece : enemyPieces) {
+                if (enemyPiece.getRow() == capturedRow && enemyPiece.getCol() == capturedCol) {
+                    removedPieces.add(enemyPiece);
+                }
+            }
+        }
+
+        for (Piece removedPiece : removedPieces) {
+            enemyPieces.remove(removedPiece);
+        }
+
+        getOwner().increamentScore(attackSequence.length);
+        setRow(newRow);
+        setCol(newCol);
+        becomeKing();
+    }
+
+    protected abstract void becomeKing();
 }
