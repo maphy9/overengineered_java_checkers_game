@@ -15,13 +15,10 @@ public class Game implements Runnable {
     private Player whitePlayer;
     private Player blackPlayer;
     private Player activePlayer;
-    private final Label whitePlayerTimeLeft;
-    private final Label blackPlayerTimeLeft;
+    Thread gameTimerThread;
 
-    public Game(GameSceneController gameSceneController, Label whitePlayerTimeLeft, Label blackPlayerTimeLeft) {
+    public Game(GameSceneController gameSceneController) {
         this.gameSceneController = gameSceneController;
-        this.whitePlayerTimeLeft = whitePlayerTimeLeft;
-        this.blackPlayerTimeLeft = blackPlayerTimeLeft;
     }
 
     @Override
@@ -51,6 +48,10 @@ public class Game implements Runnable {
                 break;
             }
         }
+
+        if (!gameTimerThread.isInterrupted()) {
+            gameTimerThread.interrupt();
+        }
     }
 
     private void configureGame() {
@@ -66,7 +67,7 @@ public class Game implements Runnable {
         drawPieces();
 
         GameTimer gameTimer = new GameTimer(this, whitePlayer, blackPlayer);
-        Thread gameTimerThread = new Thread(gameTimer);
+        gameTimerThread = new Thread(gameTimer);
         gameTimerThread.start();
     }
 

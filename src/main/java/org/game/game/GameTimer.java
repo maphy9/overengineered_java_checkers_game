@@ -52,12 +52,12 @@ public class GameTimer implements Runnable {
     void drawWhiteTime(int timeLeft) {
         int minutes = timeLeft / 60;
         int seconds = timeLeft % 60;
-        Platform.runLater(() -> game.gameSceneController.drawWhiteTime(minutes + ":" + seconds));
+        Platform.runLater(() -> game.gameSceneController.drawWhitePlayerTime(minutes + ":" + seconds));
     }
 
     void drawBlackTime(int timeLeft) {
         int minutes = timeLeft / 60;
         int seconds = timeLeft % 60;
-        Platform.runLater(() -> game.gameSceneController.drawBlackTime(minutes + ":" + seconds));
+        Platform.runLater(() -> game.gameSceneController.drawBlackPlayerTime(minutes + ":" + seconds));
     }
 }
