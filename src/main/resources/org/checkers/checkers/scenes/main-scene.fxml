@@ -8,7 +8,7 @@
 
 <AnchorPane id="main" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" style="-fx-background-image: url(&quot;background.jpg&quot;); -fx-background-size: cover;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.checkers.checkers.MainSceneController">
    <children>
-      <Button layoutX="490.0" layoutY="279.0" mnemonicParsing="false" onAction="#switchToGameScene" prefHeight="52.0" prefWidth="300.0" text="Start an offline game">
+      <Button layoutX="490.0" layoutY="279.0" mnemonicParsing="false" onAction="#switchToLocalGameScene" prefHeight="52.0" prefWidth="300.0" text="Start a local game">
          <cursor>
             <Cursor fx:constant="CROSSHAIR" />
          </cursor>

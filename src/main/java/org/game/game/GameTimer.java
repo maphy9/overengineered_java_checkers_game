@@ -6,7 +6,6 @@ public class GameTimer implements Runnable {
     private final Player whitePlayer;
     private final Player blackPlayer;
     private final Game game;
-    private final int PLAYER_TIME = 600;
 
 
     public GameTimer(Game game, Player whitePlayer, Player blackPlayer) {
@@ -17,6 +16,7 @@ public class GameTimer implements Runnable {
 
     @Override
     public void run() {
+        int PLAYER_TIME = 600;
         int whitePlayerSecondsLeft = PLAYER_TIME;
         int blackPlayerSecondsLeft = PLAYER_TIME;
 
@@ -24,8 +24,6 @@ public class GameTimer implements Runnable {
         drawBlackTime(blackPlayerSecondsLeft);
 
         while (!Thread.currentThread().isInterrupted()) {
-            System.out.println(whitePlayer);
-            System.out.println(blackPlayer);
             try {
                 Thread.sleep(1000);
                 Player activePlayer = game.getActivePlayer();

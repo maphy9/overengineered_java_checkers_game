@@ -1,7 +1,6 @@
 package org.game.game;
 
 import javafx.application.Platform;
-import javafx.scene.control.Label;
 import org.checkers.checkers.GameSceneController;
 import org.pieces.pieces.Piece;
 
@@ -12,8 +11,8 @@ import static org.checkers.checkers.Main.BOARD_SIZE;
 
 public class Game implements Runnable {
     public final GameSceneController gameSceneController;
-    private Player whitePlayer;
-    private Player blackPlayer;
+    public Player whitePlayer;
+    public Player blackPlayer;
     private Player activePlayer;
     Thread gameTimerThread;
 
@@ -29,8 +28,8 @@ public class Game implements Runnable {
             try {
                 activePlayer = whitePlayer;
                 whitePlayer.turn();
-                drawScores();
-                drawPieces();
+                blackPlayer.setLongestAttackSequences(Game.getBoard(blackPlayer, whitePlayer));
+                drawScene();
                 if (isGameOver()) {
                     drawMessage();
                     break;
@@ -38,8 +37,8 @@ public class Game implements Runnable {
 
                 activePlayer = blackPlayer;
                 blackPlayer.turn();
-                drawScores();
-                drawPieces();
+                whitePlayer.setLongestAttackSequences(Game.getBoard(whitePlayer, blackPlayer));
+                drawScene();
                 if (isGameOver()) {
                     drawMessage();
                     break;
@@ -64,19 +63,15 @@ public class Game implements Runnable {
         whitePlayer.setEnemy(blackPlayer);
         blackPlayer.setEnemy(whitePlayer);
 
-        drawPieces();
+        drawScene();
 
         GameTimer gameTimer = new GameTimer(this, whitePlayer, blackPlayer);
         gameTimerThread = new Thread(gameTimer);
         gameTimerThread.start();
     }
 
-    private void drawPieces() {
-        Platform.runLater(() -> gameSceneController.drawPieces(whitePlayer, blackPlayer));
-    }
-
-    private void drawScores() {
-        Platform.runLater(() -> gameSceneController.drawScores(whitePlayer.getScore(), blackPlayer.getScore()));
+    private void drawScene() {
+        Platform.runLater(gameSceneController::drawScene);
     }
 
     private void drawMessage() {
@@ -95,10 +90,7 @@ public class Game implements Runnable {
         if (whitePlayer.getPieces().isEmpty()) {
             return true;
         }
-        if (blackPlayer.getPieces().isEmpty()) {
-            return true;
-        }
-        return false;
+        return blackPlayer.getPieces().isEmpty();
     }
 
     public Player getActivePlayer() {

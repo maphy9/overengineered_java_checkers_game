@@ -138,7 +138,7 @@ public abstract class Man extends Piece {
             enemyPieces.remove(removedPiece);
         }
 
-        getOwner().increamentScore(attackSequence.length);
+        getOwner().incrementScore(attackSequence.length);
         setRow(newRow);
         setCol(newCol);
         becomeKing();

@@ -8,6 +8,7 @@ import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
@@ -17,18 +18,18 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
-import javafx.scene.control.Label;
+import org.game.game.AttackSequence;
 import org.game.game.Game;
 import org.game.game.Player;
 import org.pieces.pieces.Piece;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.ResourceBundle;
 
 import static org.checkers.checkers.Main.BOARD_SIZE;
 
-public class GameSceneController implements Initializable, SceneController {
+public abstract class GameSceneController implements Initializable {
     public Thread gameThread;
     private final Group whitePiecesGroup = new Group();
     private final Group blackPiecesGroup = new Group();
@@ -38,6 +39,8 @@ public class GameSceneController implements Initializable, SceneController {
     private static final int SQUARE_SIZE = 50;
     private static final String LIGHT_SQUARE_COLOR = "#FFCE9E";
     private static final String DARK_SQUARE_COLOR = "#D18B47";
+    private static final String LIGHT_SQUARE_HIGHLIGHT_COLOR = "#DB916B";
+    private static final String DARK_SQUARE_HIGHLIGHT_COLOR = "#B36132";
     private static final String LABEL_COLOR = "#FFFFFF";
 
     @FXML
@@ -59,10 +62,7 @@ public class GameSceneController implements Initializable, SceneController {
     private Label blackPlayerTimeLeft;
 
     public void switchToMainScene(ActionEvent event) throws Exception {
-        if (gameThread != null) {
-            gameThread.interrupt();
-        }
-
+        cleanup();
         URL mainSceneFxml = getClass().getResource("scenes/main-scene.fxml");
         FXMLLoader loader = new FXMLLoader(mainSceneFxml);
         Parent root = loader.load();
@@ -72,35 +72,7 @@ public class GameSceneController implements Initializable, SceneController {
         stage.show();
     }
 
-    @Override
-    public void cleanup() {
-        if (gameThread != null) {
-            gameThread.interrupt();
-        }
-    }
-
-    @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
-        if (gameThread != null) {
-            gameThread.interrupt();
-        }
-
-        game = new Game(this);
-
-        initializeGamePane();
-
-        gameThread = new Thread(game);
-        gameThread.start();
-    }
-
-    public void initializeGamePane() {
-        gamePane.getChildren().clear();
-        whitePiecesGroup.getChildren().clear();
-        blackPiecesGroup.getChildren().clear();
-        drawBoard();
-        gamePane.getChildren().add(whitePiecesGroup);
-        gamePane.getChildren().add(blackPiecesGroup);
-    }
+    public abstract void cleanup();
 
     public void drawScores(int whitePlayerScore, int blackPlayerScore) {
         whitePlayerScoreLabel.setText(String.valueOf(whitePlayerScore));
@@ -121,6 +93,24 @@ public class GameSceneController implements Initializable, SceneController {
     }
 
     public void drawBoard() {
+        List<AttackSequence> attackSequences = new ArrayList<>();
+        List<AttackSequence> selectedPieceAttackSequences = new ArrayList<>();
+        Player activePlayer = game.getActivePlayer();
+        Piece selectedPiece = null;
+
+        if (activePlayer != null) {
+            selectedPiece = activePlayer.getSelectedPiece();
+            attackSequences = activePlayer.getLongestAttackSequences();
+            if (selectedPiece != null) {
+                for (AttackSequence attackSequence : attackSequences) {
+                    if (attackSequence.piece == selectedPiece) {
+                        selectedPieceAttackSequences.add(attackSequence);
+                    }
+                }
+            }
+        }
+
+        gamePane.getChildren().clear();
         for (int row = 1; row <= BOARD_SIZE; row++) {
             for (int col = 1; col <= BOARD_SIZE; col++) {
                 Rectangle square = new Rectangle();
@@ -132,8 +122,38 @@ public class GameSceneController implements Initializable, SceneController {
 
                 if ((row + col) % 2 == 0) {
                     square.setFill(Color.valueOf(LIGHT_SQUARE_COLOR));
+                    if (selectedPiece != null) {
+                        for (AttackSequence attackSequence : selectedPieceAttackSequences) {
+                            if (attackSequence.targetRow == row && attackSequence.targetCol == col) {
+                                square.setFill(Color.valueOf(LIGHT_SQUARE_HIGHLIGHT_COLOR));
+                                break;
+                            }
+                        }
+                    } else {
+                        for (AttackSequence attackSequence : attackSequences) {
+                            if (attackSequence.sourceRow == row && attackSequence.sourceCol == col) {
+                                square.setFill(Color.valueOf(LIGHT_SQUARE_HIGHLIGHT_COLOR));
+                                break;
+                            }
+                        }
+                    }
                 } else {
                     square.setFill(Color.valueOf(DARK_SQUARE_COLOR));
+                    if (selectedPiece != null) {
+                        for (AttackSequence attackSequence : selectedPieceAttackSequences) {
+                            if (attackSequence.targetRow == row && attackSequence.targetCol == col) {
+                                square.setFill(Color.valueOf(DARK_SQUARE_HIGHLIGHT_COLOR));
+                                break;
+                            }
+                        }
+                    } else {
+                        for (AttackSequence attackSequence : attackSequences) {
+                            if (attackSequence.sourceRow == row && attackSequence.sourceCol == col) {
+                                square.setFill(Color.valueOf(DARK_SQUARE_HIGHLIGHT_COLOR));
+                                break;
+                            }
+                        }
+                    }
                 }
 
                 square.setUserData(new int[]{row, col});
@@ -147,18 +167,7 @@ public class GameSceneController implements Initializable, SceneController {
         addCoordinateLabels();
     }
 
-    private void handleSquareClick(Rectangle square) {
-        Player activePlayer = game.getActivePlayer();
-        if (activePlayer == null) {
-            return;
-        }
-        if (activePlayer.getSelectedPiece() == null) {
-            return;
-        }
-        int[] coordinates = (int[]) square.getUserData();
-        activePlayer.setSelectedRow(coordinates[0]);
-        activePlayer.setSelectedCol(coordinates[1]);
-    }
+    public abstract void handleSquareClick(Rectangle square);
 
     public void addCoordinateLabels() {
         for (int row = 1; row <= BOARD_SIZE; row++) {
@@ -201,8 +210,10 @@ public class GameSceneController implements Initializable, SceneController {
     }
 
     public void drawPieces(Player whitePlayer, Player blackPlayer) {
-        drawPiecesInGroup(whitePlayer, whitePiecesGroup);
+        gamePane.getChildren().add(whitePiecesGroup);
+        gamePane.getChildren().add(blackPiecesGroup);
 
+        drawPiecesInGroup(whitePlayer, whitePiecesGroup);
         drawPiecesInGroup(blackPlayer, blackPiecesGroup);
     }
 
@@ -230,17 +241,11 @@ public class GameSceneController implements Initializable, SceneController {
         }
     }
 
-    private void handlePieceClick(Piece piece, Player player, Group piecesGroup) {
-        if (player != game.getActivePlayer()) {
-            return;
-        }
-        if (piece == player.getSelectedPiece()) {
-            player.setSelectedPiece(null);
-        } else {
-            player.setSelectedPiece(piece);
-        }
-        player.setSelectedRow(-1);
-        player.setSelectedRow(-1);
-        drawPiecesInGroup(player, piecesGroup);
+    public abstract void handlePieceClick(Piece piece, Player player, Group piecesGroup);
+
+    public void drawScene() {
+        drawBoard();
+        drawPieces(game.whitePlayer, game.blackPlayer);
+        drawScores(game.whitePlayer.getScore(), game.blackPlayer.getScore());
     }
 }

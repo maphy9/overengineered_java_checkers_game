@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" style="-fx-background-image: url(&quot;background.jpg&quot;); -fx-background-size: cover;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.checkers.checkers.GameSceneController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" style="-fx-background-image: url(&quot;background.jpg&quot;); -fx-background-size: cover;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.checkers.checkers.LocalGameSceneController">
    <children>
       <Button layoutX="504.0" layoutY="662.0" mnemonicParsing="false" onAction="#switchToMainScene" text="Go back to main menu">
          <font>
@@ -50,7 +50,7 @@
             </Label>
          </children>
       </Pane>
-      <Label fx:id="messageLabel" layoutX="486.0" layoutY="18.0" prefHeight="35.0" prefWidth="309.0" textAlignment="CENTER" textFill="WHITE">
+      <Label fx:id="messageLabel" layoutX="558.0" layoutY="18.0" prefHeight="35.0" prefWidth="239.0" textAlignment="CENTER" textFill="WHITE">
          <font>
             <Font size="24.0" />
          </font>

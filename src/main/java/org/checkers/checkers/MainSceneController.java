@@ -9,27 +9,22 @@ import javafx.stage.Stage;
 
 import java.net.URL;
 
-public class MainSceneController implements SceneController {
-    public void switchToGameScene(ActionEvent event) throws Exception {
-        URL gameSceneFxml = getClass().getResource("scenes/game-scene.fxml");
-        FXMLLoader loader = new FXMLLoader(gameSceneFxml);
-        Parent root = loader.load();
-        SceneController controller = loader.getController();
+public class MainSceneController {
+    public void switchToLocalGameScene(ActionEvent event) throws Exception {
+        URL localGameSceneFxml = getClass().getResource("scenes/local-game-scene.fxml");
+        FXMLLoader localGameLoader = new FXMLLoader(localGameSceneFxml);
+        Parent root = localGameLoader.load();
+        GameSceneController localGameController = localGameLoader.getController();
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         Scene scene = new Scene(root);
         stage.setScene(scene);
 
         stage.setOnCloseRequest(e -> {
-            if (controller != null) {
-                controller.cleanup();
+            if (localGameController != null) {
+                localGameController.cleanup();
             }
         });
 
         stage.show();
-    }
-
-    @Override
-    public void cleanup() {
-
     }
 }
