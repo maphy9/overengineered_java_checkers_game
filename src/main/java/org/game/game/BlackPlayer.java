@@ -7,7 +7,7 @@ import java.util.List;
 
 import static org.checkers.checkers.Main.BOARD_SIZE;
 
-public class BlackPlayer extends Player {
+public abstract class BlackPlayer extends Player {
     @Override
     public void initializePieces() {
         List<Piece> pieces = getPieces();

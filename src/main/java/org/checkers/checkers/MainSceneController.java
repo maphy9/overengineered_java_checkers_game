@@ -27,4 +27,20 @@ public class MainSceneController {
 
         stage.show();
     }
+
+    public void switchToNetworkJoinScene(ActionEvent event) throws Exception {
+        URL networkJoinSceneFxml = getClass().getResource("scenes/network-join-scene.fxml");
+        FXMLLoader networkJoinSceneLoader = new FXMLLoader(networkJoinSceneFxml);
+        Parent root = networkJoinSceneLoader.load();
+        NetworkJoinSceneController networkJoinSceneController = networkJoinSceneLoader.getController();
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        Scene scene = new Scene(root);
+        stage.setScene(scene);
+
+        stage.setOnCloseRequest(e -> {
+            networkJoinSceneController.cleanup();
+        });
+
+        stage.show();
+    }
 }

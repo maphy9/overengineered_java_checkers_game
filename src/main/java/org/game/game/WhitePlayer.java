@@ -7,11 +7,7 @@ import java.util.List;
 
 import static org.checkers.checkers.Main.BOARD_SIZE;
 
-public class WhitePlayer extends Player {
-    public WhitePlayer() {
-        super();
-    }
-
+public abstract class WhitePlayer extends Player {
     @Override
     public void initializePieces() {
         List<Piece> pieces = getPieces();

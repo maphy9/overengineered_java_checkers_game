@@ -29,7 +29,7 @@ import java.util.List;
 
 import static org.checkers.checkers.Main.BOARD_SIZE;
 
-public abstract class GameSceneController implements Initializable {
+public abstract class GameSceneController implements Initializable, Cleanable {
     public Thread gameThread;
     private final Group whitePiecesGroup = new Group();
     private final Group blackPiecesGroup = new Group();
@@ -71,8 +71,6 @@ public abstract class GameSceneController implements Initializable {
         stage.setScene(scene);
         stage.show();
     }
-
-    public abstract void cleanup();
 
     public void drawScores(int whitePlayerScore, int blackPlayerScore) {
         whitePlayerScoreLabel.setText(String.valueOf(whitePlayerScore));

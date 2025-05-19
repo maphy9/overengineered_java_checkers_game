@@ -16,8 +16,10 @@ public class Game implements Runnable {
     private Player activePlayer;
     Thread gameTimerThread;
 
-    public Game(GameSceneController gameSceneController) {
+    public Game(GameSceneController gameSceneController, Player whitePlayer, Player blackPlayer) {
         this.gameSceneController = gameSceneController;
+        this.whitePlayer = whitePlayer;
+        this.blackPlayer = blackPlayer;
     }
 
     @Override
@@ -54,10 +56,7 @@ public class Game implements Runnable {
     }
 
     private void configureGame() {
-        whitePlayer = new WhitePlayer();
         whitePlayer.initializePieces();
-
-        blackPlayer = new BlackPlayer();
         blackPlayer.initializePieces();
 
         whitePlayer.setEnemy(blackPlayer);

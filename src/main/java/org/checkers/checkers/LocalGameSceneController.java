@@ -2,8 +2,7 @@ package org.checkers.checkers;
 
 import javafx.scene.Group;
 import javafx.scene.shape.Rectangle;
-import org.game.game.Game;
-import org.game.game.Player;
+import org.game.game.*;
 import org.pieces.pieces.Piece;
 
 import java.net.URL;
@@ -19,11 +18,9 @@ public class LocalGameSceneController extends GameSceneController {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        if (gameThread != null) {
-            gameThread.interrupt();
-        }
-
-        game = new Game(this);
+        WhitePlayer whitePlayer = new LocalWhitePlayer();
+        BlackPlayer blackPlayer = new LocalBlackPlayer();
+        game = new Game(this, whitePlayer, blackPlayer);
 
         gameThread = new Thread(game);
         gameThread.start();

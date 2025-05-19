@@ -15,9 +15,17 @@
          <font>
             <Font size="24.0" />
          </font></Button>
-      <Label layoutX="539.0" layoutY="112.0" text="Checkers" textFill="#ffeec6">
+      <Label layoutX="539.0" layoutY="112.0" text="Checkers" textFill="#040013">
          <font>
             <Font name="System Bold" size="48.0" />
          </font></Label>
+      <Button layoutX="490.0" layoutY="382.0" mnemonicParsing="false" onAction="#switchToNetworkJoinScene" prefHeight="52.0" prefWidth="300.0" text="Start a network game">
+         <cursor>
+            <Cursor fx:constant="CROSSHAIR" />
+         </cursor>
+         <font>
+            <Font size="24.0" />
+         </font>
+      </Button>
    </children>
 </AnchorPane>
