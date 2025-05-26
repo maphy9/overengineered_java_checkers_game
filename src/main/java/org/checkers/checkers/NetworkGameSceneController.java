@@ -1,5 +1,65 @@
 package org.checkers.checkers;
 
-public class NetworkGameSceneController {
+import org.game.game.Game;
+import org.game.game.NetworkPlayer;
+import org.game.game.Player;
 
+import java.io.IOException;
+import java.net.Socket;
+import java.net.URL;
+import java.util.ResourceBundle;
+
+public class NetworkGameSceneController extends GameSceneController {
+    private Socket clientSocket = null;
+    private boolean isHost = false;
+
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        // Initialization will be completed when setNetworkConnection is called
+    }
+
+    @Override
+    public void cleanup() {
+        if (gameThread != null) {
+            gameThread.interrupt();
+        }
+
+        if (clientSocket != null && !clientSocket.isClosed()) {
+            try {
+                clientSocket.close();
+            } catch (IOException e) {
+                System.err.println("Error closing socket: " + e.getMessage());
+            }
+        }
+    }
+
+    public void setNetworkConnection(Socket clientSocket, boolean isHost) {
+        this.clientSocket = clientSocket;
+        this.isHost = isHost;
+
+        try {
+            Player whitePlayer;
+            Player blackPlayer;
+
+            if (isHost) {
+                // Host is white player (local) and remote is black
+                whitePlayer = new NetworkPlayer(clientSocket, true);
+                blackPlayer = new NetworkPlayer(clientSocket, false);
+            } else {
+                // Client is black player (local) and remote is white
+                whitePlayer = new NetworkPlayer(clientSocket, false);
+                blackPlayer = new NetworkPlayer(clientSocket, true);
+            }
+
+            Player.initializeWhitePieces(whitePlayer);
+            Player.initializeBlackPieces(blackPlayer);
+
+            game = new Game(this, whitePlayer, blackPlayer);
+
+            gameThread = new Thread(game);
+            gameThread.start();
+        } catch (IOException e) {
+            System.err.println("Error setting up network connection: " + e.getMessage());
+        }
+    }
 }

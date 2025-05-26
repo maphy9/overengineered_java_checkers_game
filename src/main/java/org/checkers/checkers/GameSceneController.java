@@ -165,7 +165,32 @@ public abstract class GameSceneController implements Initializable, Cleanable {
         addCoordinateLabels();
     }
 
-    public abstract void handleSquareClick(Rectangle square);
+    public void handleSquareClick(Rectangle square) {
+        Player activePlayer = game.getActivePlayer();
+        if (activePlayer == null) {
+            return;
+        }
+        if (activePlayer.getSelectedPiece() == null) {
+            return;
+        }
+        int[] coordinates = (int[]) square.getUserData();
+        activePlayer.setSelectedRow(coordinates[0]);
+        activePlayer.setSelectedCol(coordinates[1]);
+    }
+
+    public void handlePieceClick(Piece piece, Player player, Group piecesGroup) {
+        if (player != game.getActivePlayer()) {
+            return;
+        }
+        if (piece == player.getSelectedPiece()) {
+            player.setSelectedPiece(null);
+        } else {
+            player.setSelectedPiece(piece);
+        }
+        player.setSelectedRow(-1);
+        player.setSelectedRow(-1);
+        drawScene();
+    }
 
     public void addCoordinateLabels() {
         for (int row = 1; row <= BOARD_SIZE; row++) {
@@ -238,8 +263,6 @@ public abstract class GameSceneController implements Initializable, Cleanable {
             piecesGroup.getChildren().add(imageView);
         }
     }
-
-    public abstract void handlePieceClick(Piece piece, Player player, Group piecesGroup);
 
     public void drawScene() {
         drawBoard();

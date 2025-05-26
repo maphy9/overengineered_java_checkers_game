@@ -1,9 +1,13 @@
 package org.game.game;
 
+import org.pieces.pieces.BlackMan;
 import org.pieces.pieces.Piece;
+import org.pieces.pieces.WhiteMan;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.checkers.checkers.Main.BOARD_SIZE;
 
 public abstract class Player {
     private final List<Piece> pieces = new ArrayList<>();
@@ -13,8 +17,6 @@ public abstract class Player {
     private volatile int selectedCol = -1;
     private int score = 0;
     private List<AttackSequence> longestAttackSequences = new ArrayList<>();
-
-    public abstract void initializePieces();
 
     public abstract void turn() throws InterruptedException;
 
@@ -84,5 +86,31 @@ public abstract class Player {
 
     public void incrementScore(int delta) {
         score += delta;
+    }
+
+    public static void initializeWhitePieces(Player player) {
+        List<Piece> pieces = player.getPieces();
+        pieces.clear();
+
+        for (int row = BOARD_SIZE; row >= 7; row--) {
+            for (int col = 1; col <= BOARD_SIZE; col++) {
+                if (row % 2 == 0 && col % 2 == 1 || row % 2 == 1 && col % 2 == 0) {
+                    pieces.add(new WhiteMan(row, col, player));
+                }
+            }
+        }
+    }
+
+    public static void initializeBlackPieces(Player player) {
+        List<Piece> pieces = player.getPieces();
+        pieces.clear();
+
+        for (int row = 1; row <= 4; row++) {
+            for (int col = 1; col <= BOARD_SIZE; col++) {
+                if (row % 2 == 0 && col % 2 == 1 || row % 2 == 1 && col % 2 == 0) {
+                    pieces.add(new BlackMan(row, col, player));
+                }
+            }
+        }
     }
 }

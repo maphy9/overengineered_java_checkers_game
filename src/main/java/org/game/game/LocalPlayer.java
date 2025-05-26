@@ -2,7 +2,7 @@ package org.game.game;
 
 import org.pieces.pieces.Piece;
 
-public class LocalWhitePlayer extends WhitePlayer {
+public class LocalPlayer extends Player {
     @Override
     public void turn() throws InterruptedException {
         while (!Thread.currentThread().isInterrupted()) {

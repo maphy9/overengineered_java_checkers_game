@@ -56,9 +56,6 @@ public class Game implements Runnable {
     }
 
     private void configureGame() {
-        whitePlayer.initializePieces();
-        blackPlayer.initializePieces();
-
         whitePlayer.setEnemy(blackPlayer);
         blackPlayer.setEnemy(whitePlayer);
 
