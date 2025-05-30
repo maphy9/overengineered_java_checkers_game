@@ -117,7 +117,7 @@ public class King extends Piece {
                 attackTargets[0][2] = row + 2;
                 attackTargets[0][3] = col + 2;
                 break;
-            } else if (board[row][col] == 'P') {
+            } else if (board[row][col] != ' ') {
                 break;
             }
             row++;
@@ -133,7 +133,7 @@ public class King extends Piece {
                 attackTargets[1][2] = row;
                 attackTargets[1][3] = col;
                 break;
-            } else if (board[row][col] == 'P') {
+            } else if (board[row][col] != ' ') {
                 break;
             }
             row--;
@@ -149,7 +149,7 @@ public class King extends Piece {
                 attackTargets[2][2] = row + 2;
                 attackTargets[2][3] = col;
                 break;
-            } else if (board[row][col] == 'P') {
+            } else if (board[row][col] != ' ') {
                 break;
             }
             row++;
@@ -165,7 +165,7 @@ public class King extends Piece {
                 attackTargets[3][2] = row;
                 attackTargets[3][3] = col + 2;
                 break;
-            } else if (board[row][col] == 'P') {
+            } else if (board[row][col] != ' ') {
                 break;
             }
             row--;

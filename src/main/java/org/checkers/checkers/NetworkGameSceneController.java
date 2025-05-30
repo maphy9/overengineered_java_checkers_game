@@ -14,9 +14,7 @@ public class NetworkGameSceneController extends GameSceneController {
     private boolean isHost = false;
 
     @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
-        // Initialization will be completed when setNetworkConnection is called
-    }
+    public void initialize(URL url, ResourceBundle resourceBundle) {}
 
     @Override
     public void cleanup() {
@@ -42,11 +40,9 @@ public class NetworkGameSceneController extends GameSceneController {
             Player blackPlayer;
 
             if (isHost) {
-                // Host is white player (local) and remote is black
                 whitePlayer = new NetworkPlayer(clientSocket, true);
                 blackPlayer = new NetworkPlayer(clientSocket, false);
             } else {
-                // Client is black player (local) and remote is white
                 whitePlayer = new NetworkPlayer(clientSocket, false);
                 blackPlayer = new NetworkPlayer(clientSocket, true);
             }

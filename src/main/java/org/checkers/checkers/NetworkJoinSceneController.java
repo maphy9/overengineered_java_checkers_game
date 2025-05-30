@@ -108,7 +108,6 @@ public class NetworkJoinSceneController implements Initializable, Cleanable {
             clientThread.interrupt();
         }
 
-        // If there's a server running, stop it properly
         if (serverThread != null && serverThread.isAlive()) {
             serverThread.interrupt();
         }
@@ -132,7 +131,6 @@ public class NetworkJoinSceneController implements Initializable, Cleanable {
         @Override
         public void run() {
             try {
-                // Remove the try-with-resources
                 Socket socket = new Socket();
                 socket.connect(new InetSocketAddress(ipAddress, port), 5000);
 
@@ -144,7 +142,6 @@ public class NetworkJoinSceneController implements Initializable, Cleanable {
                     }
                 });
 
-                // Don't close the socket here!
             } catch (IOException e) {
                 System.err.println("Client error: " + e.getMessage());
                 e.printStackTrace();
@@ -165,17 +162,12 @@ public class NetworkJoinSceneController implements Initializable, Cleanable {
             @Override
             public void run() {
                 try {
-                    // Create the server socket WITHOUT using try-with-resources
                     serverSocket = new ServerSocket(port);
                     System.out.println("Server started on port " + port);
 
-                    // Accept incoming connection
                     Socket clientSocket = serverSocket.accept();
                     System.out.println("Client connected: " + clientSocket.getInetAddress());
 
-                    // IMPORTANT: Do not close the serverSocket here!
-
-                    // Switch to game scene with the connection
                     Platform.runLater(() -> {
                         try {
                             switchToNetworkGameScene(clientSocket, true);

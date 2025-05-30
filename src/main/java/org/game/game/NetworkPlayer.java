@@ -21,9 +21,8 @@ public class NetworkPlayer extends Player {
         this.socket = socket;
         this.isLocalPlayer = isLocalPlayer;
 
-        // Initialize streams
         this.output = new ObjectOutputStream(socket.getOutputStream());
-        this.output.flush(); // Important to avoid deadlock
+        this.output.flush();
         this.input = new ObjectInputStream(socket.getInputStream());
     }
 
@@ -31,17 +30,12 @@ public class NetworkPlayer extends Player {
     @Override
     public void turn() throws InterruptedException {
         if (isLocalPlayer) {
-            // Local player makes a move and sends it to remote player
             makeLocalMove();
         } else {
-            // Remote player waits for move data from the network
             waitForRemoteMove();
         }
     }
 
-    /**
-     * Makes a move locally and sends it to the remote player
-     */
     private void makeLocalMove() throws InterruptedException {
         while (!Thread.currentThread().isInterrupted()) {
             Piece selectedPiece = getSelectedPiece();
@@ -59,19 +53,15 @@ public class NetworkPlayer extends Player {
             }
 
             if (selectedPiece.canMove(selectedRow, selectedCol)) {
-                // Get the original position before moving
                 int originalRow = selectedPiece.getRow();
                 int originalCol = selectedPiece.getCol();
 
-                // Execute the move locally
                 selectedPiece.move(selectedRow, selectedCol);
 
-                // Reset selection state
                 setSelectedRow(-1);
                 setSelectedCol(-1);
                 setSelectedPiece(null);
 
-                // Send move data to remote player
                 try {
                     MoveData moveData = new MoveData(
                             originalRow,
@@ -93,20 +83,14 @@ public class NetworkPlayer extends Player {
         }
     }
 
-    /**
-     * Waits for move data from the remote player and applies it locally
-     */
     private void waitForRemoteMove() throws InterruptedException {
         try {
-            // Set socket timeout to allow for thread interruption checks
             socket.setSoTimeout(500);
 
             while (!Thread.currentThread().isInterrupted()) {
                 try {
-                    // Wait for move data from remote player
                     MoveData moveData = (MoveData) input.readObject();
 
-                    // Find the piece by its position
                     Piece pieceToMove = null;
                     for (Piece piece : getPieces()) {
                         if (piece.getRow() == moveData.originalRow &&
@@ -124,7 +108,6 @@ public class NetworkPlayer extends Player {
                         break;
                     }
                 } catch (java.net.SocketTimeoutException e) {
-                    // This is expected - just check if thread is interrupted
                     if (Thread.currentThread().isInterrupted()) {
                         break;
                     }
@@ -136,9 +119,6 @@ public class NetworkPlayer extends Player {
         }
     }
 
-    /**
-     * Data class to represent a move for network transmission
-     */
     private static class MoveData implements java.io.Serializable {
         private final int originalRow;
         private final int originalCol;
