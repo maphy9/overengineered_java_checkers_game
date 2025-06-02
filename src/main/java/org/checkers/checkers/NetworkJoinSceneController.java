@@ -131,55 +131,98 @@ public class NetworkJoinSceneController implements Initializable, Cleanable {
         @Override
         public void run() {
             try {
-                Socket socket = new Socket();
-                socket.connect(new InetSocketAddress(ipAddress, port), 5000);
+                if (Thread.currentThread().isInterrupted()) {
+                    return;
+                }
+
+                Socket socket = new Socket(ipAddress, port);
+
+                if (Thread.currentThread().isInterrupted()) {
+                    socket.close();
+                    return;
+                }
 
                 Platform.runLater(() -> {
                     try {
                         switchToNetworkGameScene(socket, false);
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                    } catch (IOException e) {
+                        System.err.println("Error switching to network game scene: " + e.getMessage());
+                        try {
+                            socket.close();
+                        } catch (IOException ex) {
+                            System.err.println("Error closing socket: " + ex.getMessage());
+                        }
                     }
                 });
-
             } catch (IOException e) {
-                System.err.println("Client error: " + e.getMessage());
-                e.printStackTrace();
-                Platform.runLater(NetworkJoinSceneController.this::setMyIPAddress);
-            }
-        }
-
-    }
-
-    private class Server implements Runnable {
-            private int port;
-            private ServerSocket serverSocket; // Keep a reference to the socket
-
-            public Server(int port) {
-                this.port = port;
-            }
-
-            @Override
-            public void run() {
-                try {
-                    serverSocket = new ServerSocket(port);
-                    System.out.println("Server started on port " + port);
-
-                    Socket clientSocket = serverSocket.accept();
-                    System.out.println("Client connected: " + clientSocket.getInetAddress());
-
-                    Platform.runLater(() -> {
-                        try {
-                            switchToNetworkGameScene(clientSocket, true);
-                        } catch (IOException e) {
-                            System.err.println("Error switching to game scene: " + e.getMessage());
-                            e.printStackTrace();
-                        }
-                    });
-                } catch (IOException e) {
-                    System.err.println("Server error: " + e.getMessage());
-                    e.printStackTrace();
+                if (!Thread.currentThread().isInterrupted()) {
+                    System.err.println("Client connection error: " + e.getMessage());
                 }
             }
         }
+    }
+
+    private class Server implements Runnable {
+        private int port;
+        private ServerSocket serverSocket;
+
+        public Server(int port) {
+            this.port = port;
+        }
+
+        @Override
+        public void run() {
+            try {
+                serverSocket = new ServerSocket(port);
+                serverSocket.setSoTimeout(1000);
+
+                while (!Thread.currentThread().isInterrupted()) {
+                    try {
+                        Socket clientSocket = serverSocket.accept();
+
+                        if (Thread.currentThread().isInterrupted()) {
+                            clientSocket.close();
+                            break;
+                        }
+
+                        Platform.runLater(() -> {
+                            try {
+                                switchToNetworkGameScene(clientSocket, true);
+                            } catch (IOException e) {
+                                System.err.println("Error switching to network game scene: " + e.getMessage());
+                                try {
+                                    clientSocket.close();
+                                } catch (IOException ex) {
+                                    System.err.println("Error closing client socket: " + ex.getMessage());
+                                }
+                            }
+                        });
+
+                        break;
+                    } catch (SocketTimeoutException e) {
+                        if (Thread.currentThread().isInterrupted()) {
+                            break;
+                        }
+                    } catch (IOException e) {
+                        if (Thread.currentThread().isInterrupted() || serverSocket.isClosed()) {
+                            break;
+                        }
+                        System.err.println("Error accepting client connection: " + e.getMessage());
+                    }
+                }
+            } catch (IOException e) {
+                if (!Thread.currentThread().isInterrupted()) {
+                    System.err.println("Server socket error: " + e.getMessage());
+                }
+            } finally {
+                if (serverSocket != null && !serverSocket.isClosed()) {
+                    try {
+                        serverSocket.close();
+                    } catch (IOException e) {
+                        System.err.println("Error closing server socket: " + e.getMessage());
+                    }
+                }
+            }
+        }
+    }
 }

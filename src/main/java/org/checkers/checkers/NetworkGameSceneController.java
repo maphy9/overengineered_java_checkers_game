@@ -20,6 +20,12 @@ public class NetworkGameSceneController extends GameSceneController {
     public void cleanup() {
         if (gameThread != null) {
             gameThread.interrupt();
+            try {
+                gameThread.join(1000);
+            } catch (InterruptedException e) {
+                System.err.println("Interrupted while waiting for game thread to terminate: " + e.getMessage());
+            }
+            gameThread = null;
         }
 
         if (clientSocket != null && !clientSocket.isClosed()) {
@@ -27,9 +33,12 @@ public class NetworkGameSceneController extends GameSceneController {
                 clientSocket.close();
             } catch (IOException e) {
                 System.err.println("Error closing socket: " + e.getMessage());
+            } finally {
+                clientSocket = null;
             }
         }
     }
+
 
     public void setNetworkConnection(Socket clientSocket, boolean isHost) {
         this.clientSocket = clientSocket;
@@ -53,9 +62,11 @@ public class NetworkGameSceneController extends GameSceneController {
             game = new Game(this, whitePlayer, blackPlayer);
 
             gameThread = new Thread(game);
+            gameThread.setDaemon(true);
             gameThread.start();
         } catch (IOException e) {
             System.err.println("Error setting up network connection: " + e.getMessage());
         }
     }
+
 }
