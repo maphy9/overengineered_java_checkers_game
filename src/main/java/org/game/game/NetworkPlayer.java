@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.net.SocketException;
 
 public class NetworkPlayer extends Player {
     private final Socket socket;
@@ -67,7 +68,9 @@ public class NetworkPlayer extends Player {
                             originalRow,
                             originalCol,
                             selectedRow,
-                            selectedCol
+                            selectedCol,
+                            remainingTime.get(),
+                            getEnemy().remainingTime.get()
                     );
                     output.writeObject(moveData);
                     output.flush();
@@ -83,13 +86,19 @@ public class NetworkPlayer extends Player {
         }
     }
 
-    private void waitForRemoteMove() throws InterruptedException {
+    private void waitForRemoteMove() {
+        int retryCount = 0;
+        final int MAX_RETRIES = 3;
+
         try {
-            socket.setSoTimeout(500);
+            socket.setSoTimeout(100);
 
             while (!Thread.currentThread().isInterrupted()) {
                 try {
                     MoveData moveData = (MoveData) input.readObject();
+
+                    remainingTime.set(moveData.remainingTime);
+                    getEnemy().remainingTime.set(moveData.enemyRemainingTime);
 
                     Piece pieceToMove = null;
                     for (Piece piece : getPieces()) {
@@ -102,34 +111,63 @@ public class NetworkPlayer extends Player {
 
                     if (pieceToMove != null && pieceToMove.canMove(moveData.targetRow, moveData.targetCol)) {
                         pieceToMove.move(moveData.targetRow, moveData.targetCol);
-                        break;
                     } else {
                         System.err.println("Received invalid move from remote player");
-                        break;
                     }
+                    retryCount = 0;
+                    break;
                 } catch (java.net.SocketTimeoutException e) {
                     if (Thread.currentThread().isInterrupted()) {
                         break;
                     }
+                } catch (ClassNotFoundException | IOException e) {
+                    System.err.println("Error receiving move (attempt " + (retryCount+1) + "/" + MAX_RETRIES + "): " + e.getMessage());
+                    retryCount++;
+
+                    if (retryCount >= MAX_RETRIES) {
+                        System.err.println("Failed to receive move after " + MAX_RETRIES + " attempts");
+                        Thread.currentThread().interrupt();
+                        break;
+                    }
+
+                    try {
+                        Thread.sleep(200);
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                        break;
+                    }
+
+                    try {
+                        socket.setSoTimeout(100);
+                    } catch (SocketException se) {
+                        System.err.println("Failed to reset socket timeout: " + se.getMessage());
+                        Thread.currentThread().interrupt();
+                        break;
+                    }
                 }
             }
-        } catch (IOException | ClassNotFoundException e) {
-            System.err.println("Error receiving move: " + e.getMessage());
+        } catch (IOException e) {
+            System.err.println("Fatal error with socket: " + e.getMessage());
             Thread.currentThread().interrupt();
         }
     }
 
     private static class MoveData implements java.io.Serializable {
-        private final int originalRow;
-        private final int originalCol;
-        private final int targetRow;
-        private final int targetCol;
+        public final int originalRow;
+        public final int originalCol;
+        public final int targetRow;
+        public final int targetCol;
+        public final int remainingTime;
+        public final int enemyRemainingTime;
 
-        public MoveData(int originalRow, int originalCol, int targetRow, int targetCol) {
+
+        public MoveData(int originalRow, int originalCol, int targetRow, int targetCol, int remainingTime, int enemyRemainingTime) {
             this.originalRow = originalRow;
             this.originalCol = originalCol;
             this.targetRow = targetRow;
             this.targetCol = targetCol;
+            this.remainingTime = remainingTime;
+            this.enemyRemainingTime = enemyRemainingTime;
         }
     }
 }

@@ -16,25 +16,25 @@ public class GameTimer implements Runnable {
 
     @Override
     public void run() {
-        int PLAYER_TIME = 560;
-        whitePlayer.remainingTime = PLAYER_TIME;
-        blackPlayer.remainingTime = PLAYER_TIME;
+        int PLAYER_TIME = 600;
+        whitePlayer.remainingTime.set(PLAYER_TIME);
+        blackPlayer.remainingTime.set(PLAYER_TIME);
 
-        drawWhiteTime(whitePlayer.remainingTime);
-        drawBlackTime(blackPlayer.remainingTime);
+        drawWhiteTime(whitePlayer.remainingTime.get());
+        drawBlackTime(blackPlayer.remainingTime.get());
 
         while (!Thread.currentThread().isInterrupted()) {
             try {
                 Thread.sleep(1000);
                 Player activePlayer = game.getActivePlayer();
                 if (activePlayer == whitePlayer) {
-                    whitePlayer.remainingTime--;
-                    drawWhiteTime(whitePlayer.remainingTime);
+                    whitePlayer.remainingTime.set(whitePlayer.remainingTime.get() - 1);
                 } else if (activePlayer == blackPlayer) {
-                    blackPlayer.remainingTime--;
-                    drawBlackTime(blackPlayer.remainingTime);
+                    blackPlayer.remainingTime.set(blackPlayer.remainingTime.get() - 1);
                 }
-                if (blackPlayer.remainingTime == 0 || whitePlayer.remainingTime == 0) {
+                drawWhiteTime(whitePlayer.remainingTime.get());
+                drawBlackTime(blackPlayer.remainingTime.get());
+                if (blackPlayer.remainingTime.get() == 0 || whitePlayer.remainingTime.get() == 0) {
                     break;
                 }
             } catch (InterruptedException e) {

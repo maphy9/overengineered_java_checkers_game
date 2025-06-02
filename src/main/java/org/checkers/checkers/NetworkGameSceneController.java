@@ -11,7 +11,6 @@ import java.util.ResourceBundle;
 
 public class NetworkGameSceneController extends GameSceneController {
     private Socket clientSocket = null;
-    private boolean isHost = false;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {}
@@ -42,7 +41,6 @@ public class NetworkGameSceneController extends GameSceneController {
 
     public void setNetworkConnection(Socket clientSocket, boolean isHost) {
         this.clientSocket = clientSocket;
-        this.isHost = isHost;
 
         try {
             Player whitePlayer;

@@ -1,9 +1,6 @@
 package org.checkers.checkers;
 
-import javafx.scene.Group;
-import javafx.scene.shape.Rectangle;
 import org.game.game.*;
-import org.pieces.pieces.Piece;
 
 import java.net.URL;
 import java.util.ResourceBundle;

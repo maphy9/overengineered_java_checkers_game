@@ -28,6 +28,24 @@ public class MainSceneController {
         stage.show();
     }
 
+    public void switchToAIGameScene(ActionEvent event) throws Exception {
+        URL localGameSceneFxml = getClass().getResource("scenes/ai-game-scene.fxml");
+        FXMLLoader localGameLoader = new FXMLLoader(localGameSceneFxml);
+        Parent root = localGameLoader.load();
+        GameSceneController localGameController = localGameLoader.getController();
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        Scene scene = new Scene(root);
+        stage.setScene(scene);
+
+        stage.setOnCloseRequest(e -> {
+            if (localGameController != null) {
+                localGameController.cleanup();
+            }
+        });
+
+        stage.show();
+    }
+
     public void switchToNetworkJoinScene(ActionEvent event) throws Exception {
         URL networkJoinSceneFxml = getClass().getResource("scenes/network-join-scene.fxml");
         FXMLLoader networkJoinSceneLoader = new FXMLLoader(networkJoinSceneFxml);

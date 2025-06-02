@@ -6,6 +6,7 @@ import org.pieces.pieces.WhiteMan;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.checkers.checkers.Main.BOARD_SIZE;
 
@@ -16,7 +17,7 @@ public abstract class Player {
     private volatile int selectedRow = -1;
     private volatile int selectedCol = -1;
     private int score = 0;
-    public int remainingTime = 0;
+    public final AtomicInteger remainingTime = new AtomicInteger();
     private List<AttackSequence> longestAttackSequences = new ArrayList<>();
 
     public abstract void turn() throws InterruptedException;

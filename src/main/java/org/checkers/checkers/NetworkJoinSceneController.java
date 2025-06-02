@@ -104,6 +104,7 @@ public class NetworkJoinSceneController implements Initializable, Cleanable {
         if (serverThread != null) {
             serverThread.interrupt();
         }
+
         if (clientThread != null) {
             clientThread.interrupt();
         }
@@ -131,16 +132,7 @@ public class NetworkJoinSceneController implements Initializable, Cleanable {
         @Override
         public void run() {
             try {
-                if (Thread.currentThread().isInterrupted()) {
-                    return;
-                }
-
                 Socket socket = new Socket(ipAddress, port);
-
-                if (Thread.currentThread().isInterrupted()) {
-                    socket.close();
-                    return;
-                }
 
                 Platform.runLater(() -> {
                     try {
@@ -154,16 +146,12 @@ public class NetworkJoinSceneController implements Initializable, Cleanable {
                         }
                     }
                 });
-            } catch (IOException e) {
-                if (!Thread.currentThread().isInterrupted()) {
-                    System.err.println("Client connection error: " + e.getMessage());
-                }
-            }
+            } catch (IOException ignored) {}
         }
     }
 
     private class Server implements Runnable {
-        private int port;
+        private final int port;
         private ServerSocket serverSocket;
 
         public Server(int port) {
@@ -180,11 +168,6 @@ public class NetworkJoinSceneController implements Initializable, Cleanable {
                     try {
                         Socket clientSocket = serverSocket.accept();
 
-                        if (Thread.currentThread().isInterrupted()) {
-                            clientSocket.close();
-                            break;
-                        }
-
                         Platform.runLater(() -> {
                             try {
                                 switchToNetworkGameScene(clientSocket, true);
@@ -199,22 +182,10 @@ public class NetworkJoinSceneController implements Initializable, Cleanable {
                         });
 
                         break;
-                    } catch (SocketTimeoutException e) {
-                        if (Thread.currentThread().isInterrupted()) {
-                            break;
-                        }
-                    } catch (IOException e) {
-                        if (Thread.currentThread().isInterrupted() || serverSocket.isClosed()) {
-                            break;
-                        }
-                        System.err.println("Error accepting client connection: " + e.getMessage());
-                    }
+                    } catch (Exception ignored) {}
                 }
-            } catch (IOException e) {
-                if (!Thread.currentThread().isInterrupted()) {
-                    System.err.println("Server socket error: " + e.getMessage());
-                }
-            } finally {
+            } catch (IOException ignored) {}
+            finally {
                 if (serverSocket != null && !serverSocket.isClosed()) {
                     try {
                         serverSocket.close();
