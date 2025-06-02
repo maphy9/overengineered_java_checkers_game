@@ -16,25 +16,25 @@ public class GameTimer implements Runnable {
 
     @Override
     public void run() {
-        int PLAYER_TIME = 600;
-        int whitePlayerSecondsLeft = PLAYER_TIME;
-        int blackPlayerSecondsLeft = PLAYER_TIME;
+        int PLAYER_TIME = 560;
+        whitePlayer.remainingTime = PLAYER_TIME;
+        blackPlayer.remainingTime = PLAYER_TIME;
 
-        drawWhiteTime(whitePlayerSecondsLeft);
-        drawBlackTime(blackPlayerSecondsLeft);
+        drawWhiteTime(whitePlayer.remainingTime);
+        drawBlackTime(blackPlayer.remainingTime);
 
         while (!Thread.currentThread().isInterrupted()) {
             try {
                 Thread.sleep(1000);
                 Player activePlayer = game.getActivePlayer();
                 if (activePlayer == whitePlayer) {
-                    whitePlayerSecondsLeft--;
-                    drawWhiteTime(whitePlayerSecondsLeft);
+                    whitePlayer.remainingTime--;
+                    drawWhiteTime(whitePlayer.remainingTime);
                 } else if (activePlayer == blackPlayer) {
-                    blackPlayerSecondsLeft--;
-                    drawBlackTime(blackPlayerSecondsLeft);
+                    blackPlayer.remainingTime--;
+                    drawBlackTime(blackPlayer.remainingTime);
                 }
-                if (blackPlayerSecondsLeft == 0 || whitePlayerSecondsLeft == 0) {
+                if (blackPlayer.remainingTime == 0 || whitePlayer.remainingTime == 0) {
                     break;
                 }
             } catch (InterruptedException e) {
@@ -48,14 +48,14 @@ public class GameTimer implements Runnable {
     }
 
     void drawWhiteTime(int timeLeft) {
-        int minutes = timeLeft / 60;
-        int seconds = timeLeft % 60;
+        String minutes = "" + timeLeft / 60;
+        String seconds = ((timeLeft % 60) < 10 ? "0" : "") + timeLeft % 60;
         Platform.runLater(() -> game.gameSceneController.drawWhitePlayerTime(minutes + ":" + seconds));
     }
 
     void drawBlackTime(int timeLeft) {
-        int minutes = timeLeft / 60;
-        int seconds = timeLeft % 60;
+        String minutes = "" + timeLeft / 60;
+        String seconds = ((timeLeft % 60) < 10 ? "0" : "") + timeLeft % 60;
         Platform.runLater(() -> game.gameSceneController.drawBlackPlayerTime(minutes + ":" + seconds));
     }
 }

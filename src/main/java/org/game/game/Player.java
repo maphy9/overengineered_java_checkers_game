@@ -16,6 +16,7 @@ public abstract class Player {
     private volatile int selectedRow = -1;
     private volatile int selectedCol = -1;
     private int score = 0;
+    public int remainingTime = 0;
     private List<AttackSequence> longestAttackSequences = new ArrayList<>();
 
     public abstract void turn() throws InterruptedException;
