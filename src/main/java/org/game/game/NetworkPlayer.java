@@ -74,6 +74,7 @@ public class NetworkPlayer extends Player {
                     );
                     output.writeObject(moveData);
                     output.flush();
+                    output.reset();
                 } catch (IOException e) {
                     System.err.println("Error sending move: " + e.getMessage());
                     Thread.currentThread().interrupt();
@@ -91,7 +92,7 @@ public class NetworkPlayer extends Player {
         final int MAX_RETRIES = 3;
 
         try {
-            socket.setSoTimeout(100);
+            socket.setSoTimeout(1000);
 
             while (!Thread.currentThread().isInterrupted()) {
                 try {
@@ -153,6 +154,8 @@ public class NetworkPlayer extends Player {
     }
 
     private static class MoveData implements java.io.Serializable {
+        private static final long serialVersionUID = 1L;
+
         public final int originalRow;
         public final int originalCol;
         public final int targetRow;
