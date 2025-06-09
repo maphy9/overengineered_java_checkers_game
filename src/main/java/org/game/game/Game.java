@@ -33,7 +33,11 @@ public class Game implements Runnable {
                 blackPlayer.setLongestAttackSequences(Game.getBoard(blackPlayer, whitePlayer));
                 drawScene();
                 if (isGameOver()) {
-                    drawMessage();
+                    drawMessage("White player wins");
+                    break;
+                }
+                if (!blackPlayer.canMakeAnyMove()) {
+                    drawMessage("White player wins");
                     break;
                 }
 
@@ -42,7 +46,11 @@ public class Game implements Runnable {
                 whitePlayer.setLongestAttackSequences(Game.getBoard(whitePlayer, blackPlayer));
                 drawScene();
                 if (isGameOver()) {
-                    drawMessage();
+                    drawMessage("Black player wins");
+                    break;
+                }
+                if (!whitePlayer.canMakeAnyMove()) {
+                    drawMessage("Black player wins");
                     break;
                 }
             } catch(Exception e) {
@@ -70,16 +78,8 @@ public class Game implements Runnable {
         Platform.runLater(gameSceneController::drawScene);
     }
 
-    private void drawMessage() {
-        String message = "";
-        if (whitePlayer.getPieces().isEmpty()) {
-            message = "Black player wins!";
-        }
-        if (blackPlayer.getPieces().isEmpty()) {
-            message = "White player wins!";
-        }
-        String finalMessage = message;
-        Platform.runLater(() -> gameSceneController.drawMessage(finalMessage));
+    private void drawMessage(String message) {
+        Platform.runLater(() -> gameSceneController.drawMessage(message));
     }
 
     private boolean isGameOver() {

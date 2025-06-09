@@ -9,7 +9,7 @@ import java.util.List;
 
 import static org.checkers.checkers.Main.BOARD_SIZE;
 
-public class King extends Piece {
+public abstract class King extends Piece {
     public King(int row, int col, Image pieceImage, Player player) {
         super(row, col, pieceImage, player);
     }

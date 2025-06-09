@@ -115,4 +115,23 @@ public abstract class Player {
             }
         }
     }
+
+    public boolean canMakeAnyMove() {
+        if (!longestAttackSequences.isEmpty()) {
+            return true;
+        }
+
+        for (Piece piece : pieces) {
+            for (int row = 1; row <= BOARD_SIZE; row++) {
+                for (int col = 1; col <= BOARD_SIZE; col++) {
+                    if (piece.canMove(row, col)) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
 }
